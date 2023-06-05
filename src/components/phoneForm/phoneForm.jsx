@@ -1,75 +1,51 @@
-import { Formik, Field } from 'formik';
-import * as Yup from 'yup';
-import { nanoid } from 'nanoid';
-import propTypes from 'prop-types';
-import {
-  FormField,
-  Form,
-  ErrorMessage,
-  ButtonSubmit,
-} from './phoneForm.styled';
+import { useDispatch, useSelector } from 'react-redux';
+import { addContact } from '../../redux/contactSlice';
+import { getContacts } from 'redux/selectors';
+import { FormField, Form, ButtonSubmit } from './phoneForm.styled';
 
-const FormSchema = Yup.object().shape({
-  name: Yup.string().required('Required field!'),
+export const PhoneForm = () => {
+  const dispatch = useDispatch();
 
-  number: Yup.number().positive('Must be > 6!').required('Required field!'),
-});
+  const contacts = useSelector(getContacts);
 
-export const PhoneForm = ({ onSubmit, contacts }) => {
-  const handleSubmit = ({ name, number }, { resetForm }) => {
-    const nameInContacts = contacts.find(
-      contact => contact.name.toLowerCase() === name.toLowerCase()
-    );
-    if (nameInContacts) {
-      alert(`${name} is already in contacts`);
+  const handleSubmit = e => {
+    e.preventDefault();
+    const form = e.target;
+    const name = form.elements.name.value;
+    if (contacts.find(el => el.name === name)) {
+      alert(`${name} is alredy in contacts`);
       return;
     }
-    const contact = { id: nanoid(), name, number };
-    onSubmit(contact);
-    resetForm();
+    dispatch(addContact(name, form.elements.number.value));
+    form.reset();
   };
 
-  
-    return (
-      <Formik
-        initialValues={{ name: '', number: '' }}
-        validationSchema={FormSchema}
-        onSubmit={handleSubmit}
-      >
-        <Form autoComplete="off">
-          <FormField htmlFor="name">
-            Name
-            <Field
-              type="text"
-              name="name"
-              pattern="^[a-zA-Zа-яА-Я]+(([' -][a-zA-Zа-яА-Я ])?[a-zA-Zа-яА-Я]*)*$"
-              title="Name may contain only letters, apostrophe, dash and spaces. For example Adrian, Jacob Mercer, Charles de Batz de Castelmore d'Artagnan"
-              className="lable"
-              required
-            />
-            <ErrorMessage name="name" component="div" />
-          </FormField>
+  return (
+    <Form action="submit" onSubmit={handleSubmit}>
+      <FormField htmlFor="name">
+        Name
+        <input
+          type="text"
+          name="name"
+          pattern="^[a-zA-Zа-яА-Я]+(([' -][a-zA-Zа-яА-Я ])?[a-zA-Zа-яА-Я]*)*$"
+          title="Name may contain only letters, apostrophe, dash and spaces. For example Adrian, Jacob Mercer, Charles de Batz de Castelmore d'Artagnan"
+          className="lable"
+          required
+        />
+      </FormField>
 
-          <FormField htmlFor="number">
-            Number
-            <Field
-              type="tel"
-              name="number"
-              pattern="\+?\d{1,4}?[-.\s]?\(?\d{1,3}?\)?[-.\s]?\d{1,4}[-.\s]?\d{1,4}[-.\s]?\d{1,9}"
-              title="Phone number must be digits and can contain spaces, dashes, parentheses and can start with +"
-              className="lable"
-              required
-            />
-            <ErrorMessage name="number" component="div" />
-          </FormField>
-          <ButtonSubmit type="submit">Add contact</ButtonSubmit>
-        </Form>
-      </Formik>
-    );
-  }
-
-
-PhoneForm.propTypes = {
-  onSubmit: propTypes.func.isRequired,
-  contacts: propTypes.arrayOf(propTypes.object).isRequired,
+      <FormField htmlFor="number">
+        Number
+        <input
+          type="tel"
+          name="number"
+          pattern="\+?\d{1,4}?[-.\s]?\(?\d{1,3}?\)?[-.\s]?\d{1,4}[-.\s]?\d{1,4}[-.\s]?\d{1,9}"
+          title="Phone number must be digits and can contain spaces, dashes, parentheses and can start with +"
+          className="lable"
+          required
+        />
+      </FormField>
+      <ButtonSubmit type="submit">Add contact</ButtonSubmit>
+    </Form>
+  );
 };

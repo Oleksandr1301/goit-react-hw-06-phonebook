@@ -1,7 +1,7 @@
 import styled from 'styled-components';
-import { Form as FormikForm, ErrorMessage as FormikErrorMessage } from 'formik';
 
-export const Form = styled(FormikForm)`
+
+export const Form = styled.form`
   width: 200px;
   padding: 18px;
   font-size: 18px;
@@ -27,10 +27,7 @@ export const FormField = styled.label`
   }
 `;
 
-export const ErrorMessage = styled(FormikErrorMessage)`
-  font-size: 14px;
-  color: red;
-`;
+
 
 export const ButtonSubmit = styled.button`
   width: 90px;
